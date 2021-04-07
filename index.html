@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/94/three.min.js"
+    integrity="sha512-ZGgXd6TB5qjtvTU6Q5o/LJM4pwLNy8U8XXJh+vJZDXp2wC8ASrl4WOeivaq2fpYc3TnTCLzyDvVjY8YhvNYaXg=="
+    crossorigin="anonymous"
+    ></script>
+    <script
+    src="https://unpkg.com/three@0.85.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stats.js/r16/Stats.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.7.6/dat.gui.js"></script>
+    <title>Document</title>
+</head>
+<body>
+    <div id="myStats"></div>
+    <script>
+        var scene;
+        var camera;
+        var renderer;
+        var material;
+        var sphere;
+        var cube;
+        var controls;
+        var stats;
+        var controls = new (function () {
+            this.addBuilding = function(){
+                
+                var materials = [];
+                for ( var i = 0; i < 10; i ++ ) {
+                materials.push( new THREE.MeshPhongMaterial( { color: Math.random() * 0xfffff0 } ) );
+                }
+                let geometry = new THREE.CubeGeometry(1, Math.random()*20, 1);
+               
+                cube = new THREE.Mesh(geometry, materials);
+                cube.name = "cube";
+
+                cube.position.set(Math.random()*20, Math.random()*5, Math.random()*15);
+                scene.add(cube);
+          
+            }      
+        })();
+       
+        
+        function createCamera() {
+        camera = new THREE.PerspectiveCamera(
+        75,
+        window.innerWidth / window.innerHeight,
+        1,
+        100
+        );
+        
+        camera.position.z =20;
+        camera.position.y=8;
+        camera.position.x=7;
+       
+        
+        
+        }
+       
+        
+        function createRenderer() {
+        renderer = new THREE.WebGLRenderer();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+        renderer.setClearColor(new THREE.Color(0xffffff));
+        controls = new THREE.OrbitControls(camera, renderer.domElement);
+        }
+        
+        function createLightPoint() {
+            let light = new THREE.PointLight(0xffffff, 2, 200);
+
+            let sphere = new THREE.SphereGeometry(0.5, 16, 8);
+
+            light.position.set(50, 50, 50);
+            light.name = "luz punto";
+            light.add(
+            new THREE.Mesh(
+            sphere,
+            new THREE.MeshBasicMaterial({ color: 0xffff0})
+            )
+            );
+            light.position.set(13, 10, 20);
+            scene.add(light);
+        }
+
+        function createPlane(){
+            var planeGeometry = new THREE.PlaneGeometry(50, 50, 1, 1);
+            var planeMaterial = new THREE.MeshLambertMaterial({ color: 0xffffff });
+            var plane = new THREE.Mesh(planeGeometry, planeMaterial);
+            plane.rotation.x = -0.5 * Math.PI;
+            scene.add(plane);
+        }
+
+        function createStats() {
+            stats = new Stats();
+            stats.setMode(2); // 0: fps, 1: ms, 2memory
+            stats.domElement.style.position = "absolute";
+            stats.domElement.style.left = "100px";
+            stats.domElement.style.top = "10px";
+            document.getElementById("myStats").appendChild(stats.domElement);
+            return stats;
+        }
+         function createDataGui() {
+            var gui = new dat.GUI();
+                gui.add(controls, "addBuilding");
+            
+        }
+
+
+
+        function init() {
+        //create scene
+        scene = new THREE.Scene();
+        scene.fog = new THREE.Fog(0xffffff, 10,30);
+        //create camera
+        createCamera();
+      
+        createLightPoint();
+        createStats();
+        createPlane();
+        createRenderer();
+       
+        }
+        createDataGui();
+        
+       
+        
+        function animate(time) {
+       
+        requestAnimationFrame(animate);
+        renderer.render(scene, camera);
+        controls.update();
+        stats.update();
+        }
+        
+        init();
+        requestAnimationFrame(animate);
+        </script>
+    
+</body>
+</html>
